@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="../static/css/output.css" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer" />
+    {% if title %}
+    <title>{{ title }}</title>
+    {% else %}
+    <title>Hahapp</title>
+    {% endif %}
+  </head>
+  <body>
+    <div class="h-screen w-full bg-white relative flex overflow-hidden">
+      <!-- Sidebar -->
+      <aside
+        class="h-full w-16 flex flex-col space-y-10 items-center justify-center relative bg-gray-800 text-white">
+        <!-- Profil -->
+        <div
+          class="h-10 w-10 flex items-center justify-center rounded-lg cursor-pointer hover:text-gray-800 hover:bg-white hover:duration-300 hover:ease-linear focus:bg-white">
+          <i class="fa-solid fa-user"></i>
+        </div>
+
+        <!-- Anasayfa -->
+        <div
+          class="h-10 w-10 flex items-center justify-center rounded-lg cursor-pointer hover:text-gray-800 hover:bg-white hover:duration-300 hover:ease-linear focus:bg-white">
+          <i class="fa-solid fa-house"></i>
+        </div>
+
+        <!-- Yeni Postlar -->
+        <div
+          class="h-10 w-10 flex items-center justify-center rounded-lg cursor-pointer hover:text-gray-800 hover:bg-white hover:duration-300 hover:ease-linear focus:bg-white">
+          <i class="fa-solid fa-bolt"></i>
+        </div>
+        <!-- En çok beğenilen postlar -->
+        <div
+          class="h-10 w-10 flex items-center justify-center rounded-lg cursor-pointer hover:text-gray-800 hover:bg-white hover:duration-300 hover:ease-linear focus:bg-white">
+          <i class="fa-solid fa-heart"></i>
+        </div>
+        <!-- En beğenilen kullanıcılar -->
+        <div
+          class="h-10 w-10 flex items-center justify-center rounded-lg cursor-pointer hover:text-gray-800 hover:bg-white hover:duration-300 hover:ease-linear focus:bg-white">
+          <i class="fa-solid fa-trophy"></i>
+        </div>
+      </aside>
+
+      <div class="w-full h-full flex flex-col justify-between">
+        <!-- Header -->
+        <header
+          class="h-16 w-full flex items-center relative justify-end px-5 space-x-10 bg-gray-800">
+          <div class="flex flex-shrink-0 items-center space-x-4 text-white">
+            <div class="flex flex-col items-end">
+              <div class="text-md font-medium">Ad Soyad</div>
+
+              <div class="text-sm font-regular">Kullanıcı Adı</div>
+            </div>
+
+            <!-- Foto -->
+            <div
+              class="h-10 w-10 rounded-full cursor-pointer bg-gray-200 border-2 border-blue-400"></div>
+          </div>
+        </header>
+
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+  </body>
+</html>

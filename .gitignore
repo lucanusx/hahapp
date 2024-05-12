@@ -8,3 +8,8 @@ dist/
 htmlcov/
 .tox/
 docs/_build/
+.flaskenv
+node_modules/
+package-lock.json
+app.db
+migrations/
