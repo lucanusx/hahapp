@@ -1,9 +1,13 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, FileField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 import sqlalchemy as sa
 from app import db
 from app.models import User
+from wtforms import TextAreaField
+from wtforms.validators import Length
+from flask_wtf.file import FileAllowed
+
 
 class LoginForm(FlaskForm):
     username = StringField('Kullanıcı Adı', validators=[DataRequired()])
@@ -29,3 +33,27 @@ class RegistrationForm(FlaskForm):
             User.email == email.data))
         if user is not None:
             raise ValidationError('Bu email adresi zaten alınmış.')
+
+
+class EditProfileForm(FlaskForm):
+    username = StringField(
+        'Kullanıcı Adı',
+        validators=[
+            Length(min=2, message='Kullanıcı adı kısmı 2 karakterden kısa olamaz.'),
+            Length(max=25, message='Kullanıcı adı kısmı 25 karakterden uzun olamaz.'),
+            DataRequired(message='Kullanıcı adı zorunludur.')
+        ]
+    )
+    about_me = TextAreaField(
+        'Hakkında',
+        validators=[
+            Length(min=0, max=500, message='Hakkında kısmı 500 karakterden uzun olamaz.')
+        ]
+    )
+    profile_picture = FileField(
+        'Profil Resmi Güncelle',
+        validators=[
+            FileAllowed(['jpg', 'png'], message='Profil resmi yalnızca jpg veya png formatında olmalıdır.')
+        ]
+    )
+    submit = SubmitField('Güncelle')

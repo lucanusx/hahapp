@@ -1,0 +1,104 @@
+{% extends "base.html" %} {% block content %}
+
+<div class="pt-2 pl-8 pr-8 pb-8">
+  <div
+    id="alertBox"
+    class="hidden mt-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+    Profil linki kopyalandı!
+  </div>
+  <div class="p-8 bg-white shadow mt-14">
+    <div class="grid grid-cols-1 md:grid-cols-3">
+      <div
+        class="grid grid-cols-3 text-center order-last md:order-first mt-20 md:mt-0">
+        <div>
+          <p class="font-bold text-gray-700 text-xl">22</p>
+          <p class="text-gray-400">Takip</p>
+        </div>
+        <div>
+          <p class="font-bold text-gray-700 text-xl">10</p>
+          <p class="text-gray-400">Takipçi</p>
+        </div>
+        <div>
+          <p class="font-bold text-gray-700 text-xl">8129</p>
+          <p class="text-gray-400">Puan</p>
+        </div>
+      </div>
+      <div class="relative">
+        <div
+          class="w-48 h-48 mx-auto rounded-full shadow-2xl absolute inset-x-0 top-0 -mt-24 flex items-center justify-center text-indigo-500">
+          {% if user.profile_picture %}
+          <img
+            src="{{ url_for('static', filename='img/' + user.profile_picture) }}"
+            alt="profile picture"
+            class="h-48 w-48 rounded-full object-cover" />
+          {% else %}
+          <img
+            src="{{ url_for('static', filename='img/default.png') }}"
+            alt="profile picture"
+            class="h-48 w-48 rounded-full object-cover" />
+          {% endif %}
+        </div>
+      </div>
+
+      <div
+        class="space-x-8 flex justify-between mt-32 md:mt-0 md:justify-center">
+        {% if current_user.username == user.username %}
+        <div class="flex justify-center items-center h-full">
+          <a
+            href="{{ url_for('edit_profile') }}"
+            class="inline-block text-white py-4 px-4 uppercase rounded bg-blue-400 hover:bg-blue-500 shadow hover:shadow-lg font-medium transition transform hover:-translate-y-0.5">
+            Profili Düzenle
+          </a>
+        </div>
+        {% endif %}
+        <button
+          class="text-white py-2 px-4 uppercase rounded bg-gray-800 hover:bg-gray-950 shadow hover:shadow-lg font-medium transition transform hover:-translate-y-0.5"
+          onclick="copyLink()">
+          Profili Paylaş
+        </button>
+      </div>
+    </div>
+
+    <div class="mt-20 text-center border-b pb-12">
+      <h1 class="text-4xl font-medium text-gray-700" id="username">
+        {{ user.username }}
+      </h1>
+      <p class="mt-0 text-gray-500">
+        Kayıt Tarihi: {{ user.registration_date.strftime('%d %B %Y') }}
+      </p>
+      <p class="mt-8 text-gray-500">Hakkında</p>
+      <p class="mt-1 text-gray-600">
+        {% if user.about_me %} {{ user.about_me }} {% else %} Bu kullanıcı
+        hakkında bir şeyler yazmamış. {% endif %}
+      </p>
+    </div>
+  </div>
+  <div class="mt-12 flex flex-col justify-center">
+    {% if posts %}
+    <h1 class="self-center mb-4 text-2xl font-bold">Gönderiler</h1>
+    {% for post in posts %} {% include '_post.html' %} {% endfor %} {% else %}
+    <h1 class="self-center text-gray-500">
+      Bu kullanıcı henüz bir gönderi paylaşmamış.
+    </h1>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  function copyLink() {
+    const el = document.createElement("textarea");
+    el.value = window.location.href;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand("copy");
+    document.body.removeChild(el);
+
+    const alertBox = document.getElementById("alertBox");
+    alertBox.classList.remove("hidden");
+    setTimeout(() => {
+      alertBox.classList.add("hidden");
+    }, 3000);
+  }
+</script>
+
+{% endblock %}

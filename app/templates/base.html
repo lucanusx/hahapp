@@ -22,53 +22,131 @@
       <aside
         class="h-full w-16 flex flex-col space-y-10 items-center justify-center relative bg-gray-800 text-white">
         <!-- Profil -->
-        <div
-          class="h-10 w-10 flex items-center justify-center rounded-lg cursor-pointer hover:text-gray-800 hover:bg-white hover:duration-300 hover:ease-linear focus:bg-white">
-          <i class="fa-solid fa-user"></i>
-        </div>
+        <a
+          href="{{ url_for('user', username=current_user.username) }}"
+          aria-label="Profile">
+          <div
+            class="h-10 w-10 flex items-center justify-center rounded-lg cursor-pointer hover:text-gray-800 hover:bg-white hover:duration-300 hover:ease-linear focus:bg-white">
+            <i class="fa-solid fa-user"></i>
+          </div>
+        </a>
 
         <!-- Anasayfa -->
-        <div
-          class="h-10 w-10 flex items-center justify-center rounded-lg cursor-pointer hover:text-gray-800 hover:bg-white hover:duration-300 hover:ease-linear focus:bg-white">
-          <i class="fa-solid fa-house"></i>
-        </div>
+        <a href="{{url_for('homepage')}}" aria-label="Homepage">
+          <div
+            class="h-10 w-10 flex items-center justify-center rounded-lg cursor-pointer hover:text-gray-800 hover:bg-white hover:duration-300 hover:ease-linear focus:bg-white">
+            <i class="fa-solid fa-house"></i>
+          </div>
+        </a>
 
         <!-- Yeni Postlar -->
-        <div
-          class="h-10 w-10 flex items-center justify-center rounded-lg cursor-pointer hover:text-gray-800 hover:bg-white hover:duration-300 hover:ease-linear focus:bg-white">
-          <i class="fa-solid fa-bolt"></i>
-        </div>
+        <a href="#" aria-label="New Posts">
+          <div
+            class="h-10 w-10 flex items-center justify-center rounded-lg cursor-pointer hover:text-gray-800 hover:bg-white hover:duration-300 hover:ease-linear focus:bg-white">
+            <i class="fa-solid fa-bolt"></i>
+          </div>
+        </a>
+
         <!-- En çok beğenilen postlar -->
-        <div
-          class="h-10 w-10 flex items-center justify-center rounded-lg cursor-pointer hover:text-gray-800 hover:bg-white hover:duration-300 hover:ease-linear focus:bg-white">
-          <i class="fa-solid fa-heart"></i>
-        </div>
+        <a href="#" aria-label="Popular Posts">
+          <div
+            class="h-10 w-10 flex items-center justify-center rounded-lg cursor-pointer hover:text-gray-800 hover:bg-white hover:duration-300 hover:ease-linear focus:bg-white">
+            <i class="fa-solid fa-heart"></i>
+          </div>
+        </a>
+
         <!-- En beğenilen kullanıcılar -->
-        <div
-          class="h-10 w-10 flex items-center justify-center rounded-lg cursor-pointer hover:text-gray-800 hover:bg-white hover:duration-300 hover:ease-linear focus:bg-white">
-          <i class="fa-solid fa-trophy"></i>
-        </div>
+        <a href="#" aria-label="Top Users">
+          <div
+            class="h-10 w-10 flex items-center justify-center rounded-lg cursor-pointer hover:text-gray-800 hover:bg-white hover:duration-300 hover:ease-linear focus:bg-white">
+            <i class="fa-solid fa-trophy"></i>
+          </div>
+        </a>
       </aside>
 
       <div class="w-full h-full flex flex-col justify-between">
         <!-- Header -->
         <header
           class="h-16 w-full flex items-center relative justify-end px-5 space-x-10 bg-gray-800">
-          <div class="flex flex-shrink-0 items-center space-x-4 text-white">
+          <div
+            class="relative flex flex-shrink-0 items-center space-x-4 text-white">
             <div class="flex flex-col items-end">
-              <div class="text-md font-medium">Ad Soyad</div>
-
+              <div class="text-md font-medium">{{ current_user.username }}</div>
               <div class="text-sm font-regular">Kullanıcı Adı</div>
             </div>
 
-            <!-- Foto -->
-            <div
-              class="h-10 w-10 rounded-full cursor-pointer bg-gray-200 border-2 border-blue-400"></div>
+            <!-- Profil Resmi ve Dropdown Menü -->
+            <div class="relative">
+              <a href="{{ url_for('user', username=current_user.username) }}">
+                <img
+                  id="profile-picture"
+                  src="{{ url_for('static', filename='img/' + current_user.profile_picture) }}"
+                  class="h-10 w-10 rounded-full cursor-pointer bg-gray-200 border-2 border-blue-400 object-cover"
+                  alt="Profile Picture" />
+              </a>
+
+              <!-- Dropdown Menü -->
+              <div
+                id="profile-dropdown"
+                class="absolute right-0 mt-3 z-10 w-40 bg-gray-800 rounded-lg shadow-lg py-2 hidden">
+                <a
+                  href="{{ url_for('user', username=current_user.username) }}"
+                  class="block px-4 py-2 text-white hover:bg-gray-900"
+                  >Profil</a
+                >
+                <a
+                  href="{{ url_for('logout') }}"
+                  class="block px-4 py-2 text-white hover:bg-gray-900"
+                  >Çıkış Yap</a
+                >
+              </div>
+            </div>
           </div>
         </header>
 
-        {% block content %}{% endblock %}
+        <!-- Main Content Area -->
+        <div class="overflow-y-auto py-4 px-5">
+          {% block content %}{% endblock %}
+        </div>
       </div>
     </div>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const profilePicture = document.getElementById("profile-picture");
+        const profileDropdown = document.getElementById("profile-dropdown");
+
+        // Mobil cihazlarda ve masaüstünde düzgün çalışması için click olayı da eklendi
+        profilePicture.addEventListener("click", function (event) {
+          // Prevent the link from redirecting immediately
+          event.preventDefault();
+          // Toggle dropdown visibility
+          profileDropdown.classList.toggle("hidden");
+        });
+
+        // Hover olayları yalnızca geniş ekranlar için geçerli olacak
+        if (window.innerWidth > 768) {
+          profilePicture.addEventListener("mouseenter", function () {
+            profileDropdown.classList.remove("hidden");
+          });
+
+          profilePicture.addEventListener("mouseleave", function () {
+            setTimeout(function () {
+              if (!profileDropdown.matches(":hover")) {
+                profileDropdown.classList.add("hidden");
+              }
+            }, 200);
+          });
+
+          profileDropdown.addEventListener("mouseenter", function () {
+            profileDropdown.classList.remove("hidden");
+          });
+
+          profileDropdown.addEventListener("mouseleave", function () {
+            profileDropdown.classList.add("hidden");
+          });
+        }
+      });
+    </script>
   </body>
 </html>
