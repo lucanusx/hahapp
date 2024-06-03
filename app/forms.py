@@ -15,7 +15,7 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Giriş Yap')
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
+    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=25)])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     password2 = PasswordField(
@@ -53,7 +53,18 @@ class EditProfileForm(FlaskForm):
     profile_picture = FileField(
         'Profil Resmi Güncelle',
         validators=[
-            FileAllowed(['jpg', 'png'], message='Profil resmi yalnızca jpg veya png formatında olmalıdır.')
+            FileAllowed(['jpg', 'png','jpeg','gif'], message='Profil resmi yalnızca jpg, jpeg, png, gif formatında olmalıdır.')
         ]
     )
     submit = SubmitField('Güncelle')
+
+    def __init__(self, original_username, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.original_username = original_username
+
+    def validate_username(self, username):
+        if username.data != self.original_username:
+            user = db.session.scalar(sa.select(User).where(
+                User.username == self.username.data))
+            if user is not None:
+                raise ValidationError('Bu kullanıcı adı kullanılmaktadır.')

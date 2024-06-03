@@ -81,7 +81,7 @@ def user(username):
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
-    form = EditProfileForm()
+    form = EditProfileForm(current_user.username)
     if form.validate_on_submit():
         current_user.username = form.username.data
         current_user.about_me = form.about_me.data
@@ -109,3 +109,7 @@ def save_picture(form_picture):
     picture_path = os.path.join(app.root_path, 'static/img', picture_fn)
     form_picture.save(picture_path)
     return picture_fn
+
+@app.route('/500')
+def error_500():
+    return render_template('500.html')
