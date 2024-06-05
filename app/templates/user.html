@@ -11,11 +11,15 @@
       <div
         class="grid grid-cols-3 text-center order-last md:order-first mt-20 md:mt-0">
         <div>
-          <p class="font-bold text-gray-700 text-xl">22</p>
+          <p class="font-bold text-gray-700 text-xl">
+            {{ user.following_count() }}
+          </p>
           <p class="text-gray-400">Takip</p>
         </div>
         <div>
-          <p class="font-bold text-gray-700 text-xl">10</p>
+          <p class="font-bold text-gray-700 text-xl">
+            {{ user.followers_count() }}
+          </p>
           <p class="text-gray-400">Takipçi</p>
         </div>
         <div>
@@ -49,6 +53,34 @@
             class="inline-block text-white py-4 px-4 uppercase rounded bg-blue-400 hover:bg-blue-500 shadow hover:shadow-lg font-medium transition transform hover:-translate-y-0.5">
             Profili Düzenle
           </a>
+        </div>
+        {% else %}
+        <div class="flex justify-center items-center h-full">
+          {% if current_user.is_following(user) %}
+          <form
+            action="{{ url_for('unfollow', username=user.username) }}"
+            method="post"
+            class="inline-block">
+            {{ form.hidden_tag() }}
+            <button
+              type="submit"
+              class="inline-block text-white py-4 px-4 uppercase rounded bg-red-400 hover:bg-red-500 shadow hover:shadow-lg font-medium transition transform hover:-translate-y-0.5">
+              Takipten Çık
+            </button>
+          </form>
+          {% else %}
+          <form
+            action="{{ url_for('follow', username=user.username) }}"
+            method="post"
+            class="inline-block">
+            {{ form.hidden_tag() }}
+            <button
+              type="submit"
+              class="inline-block text-white py-4 px-4 uppercase rounded bg-green-400 hover:bg-green-500 shadow hover:shadow-lg font-medium transition transform hover:-translate-y-0.5">
+              Takip Et
+            </button>
+          </form>
+          {% endif %}
         </div>
         {% endif %}
         <button
