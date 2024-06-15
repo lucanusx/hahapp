@@ -1,0 +1,181 @@
+{% extends "base.html" %} {% block content %}
+<div class="container mx-auto mt-8 max-w-4xl">
+  <div
+    id="alert-box"
+    class="hidden p-4 mb-4 text-sm text-white rounded-lg"
+    role="alert"></div>
+  <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+    {% if post.image_location %}
+    <img
+      src="{{ url_for('static', filename='img/' + post.image_location) }}"
+      class="w-full max-h-96 object-contain"
+      alt="Post Image" />
+    {% endif %}
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center">
+          <a href="{{url_for('user', username=post.user.username)}}">
+            <img
+              src="{{ url_for('static', filename='img/' + post.user.profile_picture) }}"
+              class="w-12 h-12 rounded-full mr-3"
+              alt="Profile Picture" />
+          </a>
+          <h1 class="text-md font-semibold">
+            <a
+              href="{{url_for('user', username=post.user.username)}}"
+              class="hover:underline">
+              {{ post.user.username }}
+            </a>
+          </h1>
+        </div>
+        <p class="text-gray-600 text-sm">
+          Tarih:
+          <span class="font-semibold"
+            >{{ post.upload_date.strftime('%Y-%m-%d %H:%M') }}</span
+          >
+        </p>
+      </div>
+      <h2 class="text-lg font-bold mb-4">{{ post.post_text }}</h2>
+      <div class="right-0 flex items-center mt-4">
+        <span
+          id="like-count-{{ post.post_id }}"
+          class="text-gray-600 mr-4 text-3xl"
+          >{{ post.like_count }}</span
+        >
+        <a
+          id="like-button"
+          class="like-button flex items-center text-gray-600 hover:text-blue-600 mr-4 {{ 'text-blue-600' if liked == True }}"
+          data-liked="{{ liked }}">
+          <i class="fas fa-thumbs-up text-2xl hover:cursor-pointer"></i>
+        </a>
+        <a
+          id="dislike-button"
+          class="dislike-button flex items-center text-gray-600 hover:text-red-600 {{ 'text-red-600' if liked == False }}"
+          data-liked="{{ liked }}">
+          <i class="fas fa-thumbs-down text-2xl hover:cursor-pointer"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .like-button,
+  .dislike-button {
+    transition: color 0.3s ease, transform 0.3s ease;
+  }
+
+  .like-button:hover,
+  .dislike-button:hover {
+    transform: scale(1.2);
+  }
+
+  .liked {
+    color: #1d4ed8; /* blue-700 */
+    animation: like-animation 0.3s forwards;
+  }
+
+  .disliked {
+    color: #dc2626; /* red-600 */
+    animation: dislike-animation 0.3s forwards;
+  }
+
+  @keyframes like-animation {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.3);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes dislike-animation {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.3);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+</style>
+
+<script>
+  function showAlert(message, type) {
+    const alertBox = document.getElementById("alert-box");
+    alertBox.textContent = message;
+    alertBox.className = `p-4 mb-4 text-sm text-white rounded-lg bg-${type}-500`;
+    alertBox.classList.remove("hidden");
+    setTimeout(() => {
+      alertBox.classList.add("hidden");
+    }, 3000);
+  }
+
+  function updateButtonColors(likeStatus) {
+    const likeButton = document.getElementById("like-button");
+    const dislikeButton = document.getElementById("dislike-button");
+
+    if (likeStatus === "liked") {
+      likeButton.classList.add("liked");
+      dislikeButton.classList.remove("disliked");
+    } else if (likeStatus === "disliked") {
+      dislikeButton.classList.add("disliked");
+      likeButton.classList.remove("liked");
+    } else {
+      likeButton.classList.remove("liked");
+      dislikeButton.classList.remove("disliked");
+    }
+  }
+
+  document.getElementById("like-button").addEventListener("click", () => {
+    fetch(`/like/{{ post.post_id }}`, { method: "POST" })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          const likeCount = document.getElementById(
+            `like-count-{{ post.post_id }}`
+          );
+          likeCount.textContent = data.like_count;
+          updateButtonColors("liked");
+        } else {
+          showAlert(data.message, "red");
+        }
+      });
+  });
+
+  document.getElementById("dislike-button").addEventListener("click", () => {
+    fetch(`/dislike/{{ post.post_id }}`, { method: "POST" })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          const likeCount = document.getElementById(
+            `like-count-{{ post.post_id }}`
+          );
+          likeCount.textContent = data.like_count;
+          updateButtonColors("disliked");
+        } else {
+          showAlert(data.message, "red");
+        }
+      });
+  });
+
+  window.addEventListener("DOMContentLoaded", () => {
+    const likeButton = document.getElementById("like-button");
+    const liked = likeButton.getAttribute("data-liked");
+
+    if (liked === "True") {
+      updateButtonColors("liked");
+    } else if (liked === "False") {
+      updateButtonColors("disliked");
+    } else {
+      updateButtonColors(null);
+    }
+  });
+</script>
+
+{% endblock %}

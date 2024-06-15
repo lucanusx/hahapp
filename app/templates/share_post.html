@@ -1,0 +1,77 @@
+{% extends "base.html" %} {% block content %}
+<div class="flex justify-center items-center mb-16">
+  <div class="bg-white rounded-lg shadow-md p-8 max-w-md w-full">
+    <div id="alertContainer"></div>
+    <!-- Uyarı mesajı buraya eklenecek -->
+    <h1 class="text-2xl font-bold mb-4">Yeni Gönderi Paylaş</h1>
+    {% if flash_success %}
+    <div
+      id="successAlert"
+      class="p-4 mb-4 bg-green-100 border border-green-400 text-green-700 rounded">
+      {{ flash_success }}
+    </div>
+    {% endif %} {% if form.errors %}
+    <div
+      id="errorAlert"
+      class="p-4 mb-4 bg-red-100 border border-red-400 text-red-700 rounded">
+      <ul class="list-disc pl-5">
+        {% for field, errors in form.errors.items() %} {% for error in errors %}
+        <li>{{ field }}: {{ error }}</li>
+        {% endfor %} {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+    <form
+      id="postForm"
+      action=""
+      method="post"
+      enctype="multipart/form-data"
+      class="space-y-6">
+      {{ form.hidden_tag() }}
+      <div>
+        <label for="post_text" class="block mb-1 text-lg">Gönderi Metni</label>
+        {{ form.post_text(cols=50, rows=6, class="w-full border-2
+        border-gray-300 p-3 rounded-lg focus:outline-none
+        focus:border-blue-500") }} {% if form.post_text.errors %}
+        <span class="text-red-600 text-sm">{{ form.post_text.errors[0] }}</span>
+        {% endif %}
+      </div>
+      <div>
+        <label for="image" class="block mb-1 text-lg">Resim Ekle</label>
+        {{ form.image(class="w-full border-2 border-gray-300 p-3 rounded-lg
+        focus:outline-none focus:border-blue-500") }} {% if form.image.errors %}
+        <span class="text-red-600 text-sm">{{ form.image.errors[0] }}</span>
+        {% endif %}
+      </div>
+      <div>
+        {{ form.submit(class="bg-blue-500 text-white px-6 py-3 rounded-lg
+        hover:bg-blue-600 focus:outline-none focus:bg-blue-600") }}
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.getElementById("postForm").onsubmit = function (event) {
+    event.preventDefault(); // Prevent the default form submission
+    fetch("", {
+      method: "POST",
+      body: new FormData(this),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          const successAlert = document.createElement("div");
+          successAlert.className =
+            "p-4 mb-4 bg-green-100 border border-green-400 text-green-700 rounded";
+          successAlert.innerText = "Gönderiniz paylaşıldı!";
+          document.getElementById("alertContainer").appendChild(successAlert);
+
+          setTimeout(() => {
+            window.location.href = "{{ url_for('homepage') }}";
+          }, 2000); // 2 seconds
+        }
+      });
+  };
+</script>
+{% endblock %}

@@ -40,7 +40,7 @@
         </a>
 
         <!-- Yeni Postlar -->
-        <a href="#" aria-label="New Posts">
+        <a href="{{url_for('recent_posts')}}" aria-label="New Posts">
           <div
             class="h-10 w-10 flex items-center justify-center rounded-lg cursor-pointer hover:text-gray-800 hover:bg-white hover:duration-300 hover:ease-linear focus:bg-white">
             <i class="fa-solid fa-bolt"></i>
@@ -103,12 +103,17 @@
             </div>
           </div>
         </header>
-
         <!-- Main Content Area -->
         <div class="overflow-y-auto py-4 px-5">
           {% block content %}{% endblock %}
         </div>
       </div>
+      <a
+        href="{{url_for('share_post')}}"
+        class="fixed bottom-10 right-10 bg-gray-700 text-white w-12 h-12 flex items-center justify-center rounded-full shadow-lg hover:bg-gray-800 transition duration-300"
+        aria-label="Share Post">
+        <i class="fa-solid fa-plus text-xl"></i>
+      </a>
     </div>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -116,15 +121,11 @@
         const profilePicture = document.getElementById("profile-picture");
         const profileDropdown = document.getElementById("profile-dropdown");
 
-        // Mobil cihazlarda ve masaüstünde düzgün çalışması için click olayı da eklendi
         profilePicture.addEventListener("click", function (event) {
-          // Prevent the link from redirecting immediately
           event.preventDefault();
-          // Toggle dropdown visibility
           profileDropdown.classList.toggle("hidden");
         });
 
-        // Hover olayları yalnızca geniş ekranlar için geçerli olacak
         if (window.innerWidth > 768) {
           profilePicture.addEventListener("mouseenter", function () {
             profileDropdown.classList.remove("hidden");

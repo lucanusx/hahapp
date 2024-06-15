@@ -2,18 +2,15 @@
 <!-- Postlar -->
 <main class="max-w-full h-full flex relative">
   <!-- Container -->
-  <div
-    class="w-full m-4 flex flex-wrap items-start justify-start rounded-tl grid-flow-col auto-cols-max gap-4">
-    <!-- Container -->
-    <div class="w-96 h-60 rounded-lg flex-shrink-0 flex-grow bg-gray-400"></div>
-    <div class="w-96 h-60 rounded-lg flex-shrink-0 flex-grow bg-gray-400"></div>
-    <div class="w-96 h-60 rounded-lg flex-shrink-0 flex-grow bg-gray-400"></div>
-    <div class="w-96 h-60 rounded-lg flex-shrink-0 flex-grow bg-gray-400"></div>
-    <div class="w-96 h-60 rounded-lg flex-shrink-0 flex-grow bg-gray-400"></div>
-    <div class="w-96 h-60 rounded-lg flex-shrink-0 flex-grow bg-gray-400"></div>
-    <div class="w-96 h-60 rounded-lg flex-shrink-0 flex-grow bg-gray-400"></div>
-    <div class="w-96 h-60 rounded-lg flex-shrink-0 flex-grow bg-gray-400"></div>
-    <div class="w-96 h-60 rounded-lg flex-shrink-0 flex-grow bg-gray-400"></div>
+  <div class="w-full m-4 flex flex-wrap items-start justify-start gap-4">
+    {% for post in posts %}
+    <!-- Post -->
+    <div
+      class="w-96 rounded-lg bg-white overflow-hidden shadow-lg flex-shrink-0 flex-grow">
+      {% include "_post.html" %}
+    </div>
+    <!-- /Post -->
+    {% endfor %}
   </div>
 </main>
 {% endblock %}

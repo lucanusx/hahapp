@@ -72,3 +72,20 @@ class EditProfileForm(FlaskForm):
 
 class EmptyForm(FlaskForm):
     submit = SubmitField('Submit')
+
+class PostForm(FlaskForm):
+    post_text = TextAreaField(
+        'Açıklama',
+        validators=[
+            DataRequired(message='Post metni zorunludur.'),
+            Length(min=1, max=300, message='Post metni 1 ile 300 karakter arasında olmalıdır.')
+        ]
+    )
+    image = FileField(
+        'Resim Ekle',
+        validators=[
+            FileAllowed(['jpg', 'jpeg', 'png', 'gif', 'webp'], message='Yalnızca jpg, jpeg, png, gif formatında resimler yükleyebilirsiniz.')
+        ]
+    )
+    submit = SubmitField('Gönder')
+

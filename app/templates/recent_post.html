@@ -1,0 +1,8 @@
+{% extends "base.html" %} {% block content %}
+<div class="flex flex-col items-center">
+  <h1 class="text-3xl font-bold mb-6">Son Paylaşılan Gönderiler</h1>
+  <div class="grid grid-cols-12 gap-4">
+    {% for post in posts %} {% include "_post.html" %} {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -17,3 +17,4 @@ app/static/img/*
 /logs/
 *.log
 app_backup.db
+get-pip.py

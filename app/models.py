@@ -90,8 +90,8 @@ class Post(db.Model):
     post_text = sa.Column(sa.String)
     image_location = sa.Column(sa.String)
     upload_date = sa.Column(sa.DateTime, default=datetime.now(timezone.utc))
-    like_count = sa.Column(sa.Integer)
-    comment_count = sa.Column(sa.Integer)
+    like_count = sa.Column(sa.Integer, default=0)
+    comment_count = sa.Column(sa.Integer, default=0)
     user = so.relationship("User", back_populates="posts")
 
     def __repr__(self):
@@ -100,3 +100,19 @@ class Post(db.Model):
 @login.user_loader
 def load_user(user_id):
     return db.session.get(User, int(user_id))
+
+
+class PostLike(db.Model):
+    __tablename__ = 'post_likes'
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    user_id = sa.Column(sa.Integer, sa.ForeignKey('users.user_id'))
+    post_id = sa.Column(sa.Integer, sa.ForeignKey('posts.post_id'))
+    liked = sa.Column(sa.Boolean, default=True)  # True if liked, False if disliked
+    timestamp = sa.Column(sa.DateTime, default=datetime.now(timezone.utc))
+
+    user = so.relationship("User", back_populates="post_likes")
+    post = so.relationship("Post", back_populates="post_likes")
+
+User.post_likes = so.relationship("PostLike", back_populates="user")
+Post.post_likes = so.relationship("PostLike", back_populates="post")

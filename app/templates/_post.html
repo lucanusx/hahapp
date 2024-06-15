@@ -1,36 +1,52 @@
 <div class="col-span-12">
-  <div
-    class="w-full max-w-3xl mx-auto bg-white flex flex-col p-6 rounded-lg shadow-lg border border-gray-200">
-    <!-- Post Image/Video -->
-    <div class="relative">
-      <a href="#">
-        <img
-          src="{{ url_for('static', filename='img/640767.png') }}"
-          class="w-full rounded-lg object-cover"
-          alt="Post Image/Video" />
-      </a>
-    </div>
-
-    <!-- Profile Picture and Description -->
-    <div class="flex flex-row mt-4 gap-4 items-start">
-      <!-- Profile Picture -->
-      <a href="{{ url_for('user', username=post.author.username) }}">
-        <img
-          src="{{ url_for('static', filename='img/' + post.author.profile_picture) }}"
-          class="rounded-full h-14 w-14 object-cover border-2 border-gray-300"
-          alt="Profile Picture" />
-      </a>
-
-      <!-- Description -->
-      <div class="flex flex-col justify-center">
-        <a href="{{ url_for('user', username=post.author.username) }}">
-          <p class="text-gray-900 text-lg font-bold">
-            {{ post.author.username }}
-          </p>
+  <a href="{{ url_for('show_post', post_id=post.post_id) }}" class="block">
+    <div
+      class="w-full max-w-3xl mx-auto bg-white flex flex-col p-6 rounded-lg shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300">
+      <!-- Post Image/Video -->
+      <div class="relative h-64">
+        <a href="{{ url_for('show_post', post_id=post.post_id) }}">
+          <img
+            src="{{ url_for('static', filename='img/' + post.image_location) }}"
+            class="w-full h-full rounded-lg object-cover"
+            alt="Post Image/Video" />
         </a>
-        <a class="text-blue-600 text-sm mt-1 hover:underline" href="#"> </a>
-        <p class="text-gray-700 text-sm mt-2">{{ post.post_text }}</p>
+      </div>
+
+      <!-- Profile Picture and Description -->
+      <div class="flex flex-row mt-4 gap-4 items-start">
+        <!-- Profile Picture -->
+        <a
+          href="{{ url_for('user', username=post.user.username) }}"
+          class="flex-shrink-0">
+          <img
+            src="{{ url_for('static', filename='img/' + post.user.profile_picture) }}"
+            class="rounded-full h-14 w-14 object-cover border-2 border-gray-300"
+            alt="Profile Picture" />
+        </a>
+
+        <!-- Description -->
+        <div class="flex flex-col justify-center flex-grow">
+          <a
+            href="{{ url_for('user', username=post.user.username) }}"
+            class="text-gray-900 text-lg font-bold hover:underline">
+            {{ post.user.username }}
+          </a>
+          <a
+            class="text-gray-600 text-sm mt-1 hover:underline"
+            href="{{ url_for('show_post', post_id=post.post_id) }}">
+            {{ post.upload_date.strftime('%Y-%m-%d %H:%M') }}
+          </a>
+          <p class="text-gray-700 text-sm mt-2">
+            {% if post.post_text|length > 70 %} {{ post.post_text[:70] }}...
+            <a
+              href="{{ url_for('show_post', post_id=post.post_id) }}"
+              class="text-blue-400 hover:underline"
+              >Devamını Oku</a
+            >
+            {% else %} {{ post.post_text }} {% endif %}
+          </p>
+        </div>
       </div>
     </div>
-  </div>
+  </a>
 </div>
