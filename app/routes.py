@@ -2,8 +2,8 @@ from flask import render_template, flash, redirect, url_for, request, get_flashe
 from flask_login import login_user, logout_user, current_user, login_required
 import sqlalchemy as sa
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, EmptyForm, EditProfileForm, PostForm
-from app.models import User, Post, PostLike
+from app.forms import LoginForm, RegistrationForm, EmptyForm, EditProfileForm, PostForm, CommentForm
+from app.models import User, Post, PostLike, Comment
 from datetime import datetime, timezone
 from werkzeug.utils import secure_filename
 import os
@@ -42,9 +42,13 @@ def login():
 @app.route('/home')
 @app.route('/homepage')
 def homepage():
-    posts = db.session.scalars(current_user.following_posts()).all()
-    return render_template('home.html', posts=posts, title='Anasayfa')
-
+    page = request.args.get('page', 1, type=int)
+    per_page = app.config['POSTS_PER_PAGE']
+    query = current_user.following_posts()
+    posts = db.paginate(query, page=page, per_page=per_page, error_out=False)
+    next_url = url_for('homepage', page=posts.next_num) if posts.has_next else None
+    prev_url = url_for('homepage', page=posts.prev_num) if posts.has_prev else None
+    return render_template('home.html', posts=posts.items, next_url=next_url, prev_url=prev_url, title='Anasayfa')
 
 @app.route('/logout')
 def logout():
@@ -70,7 +74,17 @@ def register():
 def user(username):
     user = db.first_or_404(sa.select(User).where(User.username == username))
     form = EmptyForm()
-    return render_template('user.html', user=user, form=form)
+    
+    page = request.args.get('page', 1, type=int)
+    per_page = app.config['POSTS_PER_PAGE']
+    query = sa.select(Post).where(Post.user_id == user.user_id).order_by(Post.upload_date.desc())
+    posts = db.paginate(query, page=page, per_page=per_page, error_out=False)
+    
+    next_url = url_for('user', username=user.username, page=posts.next_num) if posts.has_next else None
+    prev_url = url_for('user', username=user.username, page=posts.prev_num) if posts.has_prev else None
+    
+    return render_template('user.html', user=user, form=form, posts=posts.items, next_url=next_url, prev_url=prev_url)
+
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
@@ -119,6 +133,7 @@ def share_post():
         
         post = Post(user=current_user, post_text=post_text, image_location=image_file)
         db.session.add(post)
+        current_user.score += app.config['SCORE_PER_POST']
         db.session.commit()
         flash('Gönderiniz paylaşıldı!', 'success')
         return jsonify(success=True)
@@ -166,26 +181,67 @@ def unfollow(username):
         return redirect(url_for('index'))
 
 
-@app.route('/recent_posts')
 @login_required
+@app.route('/recent_posts')
 def recent_posts():
-    posts = db.session.execute(
-        sa.select(Post).order_by(Post.upload_date.desc()).limit(10)
-    ).scalars().all()
-    return render_template('recent_post.html', posts=posts)
+    page = request.args.get('page', 1, type=int)
+    per_page = app.config['POSTS_PER_PAGE']
+    query = sa.select(Post).order_by(Post.upload_date.desc())
+    posts = db.paginate(query, page=page, per_page=per_page, error_out=False)
+    next_url = url_for('recent_posts', page=posts.next_num) if posts.has_next else None
+    prev_url = url_for('recent_posts', page=posts.prev_num) if posts.has_prev else None
+    return render_template('recent_post.html', posts=posts.items, next_url=next_url, prev_url=prev_url)
 
-@app.route('/p/<int:post_id>')
+@app.route('/add_comment/<int:post_id>', methods=['POST'])
+@login_required
+def add_comment(post_id):
+    form = CommentForm()
+    if form.validate_on_submit():
+        comment = Comment(
+            post_id=post_id,
+            user_id=current_user.user_id,
+            comment_text=form.comment_text.data, 
+            timestamp=datetime.now(timezone.utc)
+        )
+        db.session.add(comment)
+
+        post = db.session.get(Post, post_id)
+        if post:
+            post.user.score += app.config['SCORE_PER_COMMENT']
+            current_user.score += app.config['SCORE_PER_COMMENT'] 
+
+        db.session.commit()
+        flash('Your comment has been added.', 'success')
+    else:
+        flash('Error: Your comment could not be added.', 'danger')
+    return redirect(url_for('show_post', post_id=post_id))
+
+@app.route('/p/<int:post_id>', methods=['GET', 'POST'])
 @login_required
 def show_post(post_id):
-    post = db.session.query(Post).filter_by(post_id=post_id).first()
-    if post:
-        post_like = db.session.query(PostLike).filter_by(user_id=current_user.user_id, post_id=post_id).first()
-        liked = post_like.liked if post_like else None
-        return render_template('show_post.html', post=post, liked=liked)
-    else:
-        flash('Gönderi bulunamadı!', 'error')
-        return redirect(url_for('index'))
-
+    post = db.first_or_404(sa.select(Post).where(Post.post_id == post_id))
+    form = CommentForm()
+    if form.validate_on_submit():
+        comment = Comment(
+            post_id=post_id,
+            user_id=current_user.user_id,
+            text=form.comment_text.data,
+        )
+        db.session.add(comment)
+        db.session.commit()
+        flash('Yorumunuz eklendi.', 'success')
+        return redirect(url_for('show_post', post_id=post_id))
+    
+    comments = db.session.scalars(
+        sa.select(Comment).where(Comment.post_id == post_id).order_by(Comment.timestamp.asc())
+    ).all()
+    
+    post_like = db.session.scalar(
+        sa.select(PostLike).where(PostLike.user_id == current_user.user_id, PostLike.post_id == post_id)
+    )
+    liked = post_like.liked if post_like else None
+    
+    return render_template('show_post.html', post=post, liked=liked, comments=comments, form=form)
 
 @app.route('/like/<int:post_id>', methods=['POST'])
 @login_required
@@ -198,10 +254,12 @@ def like_post(post_id):
                 return jsonify(success=False, message="Zaten beğendiniz."), 400
             else:
                 post_like.liked = True
+                post.user.score += app.config['SCORE_PER_LIKE'] * 2
                 post.like_count += 2  
         else:
             new_like = PostLike(user_id=current_user.user_id, post_id=post_id, liked=True)
             db.session.add(new_like)
+            post.user.score += app.config['SCORE_PER_LIKE']
             post.like_count += 1
         db.session.commit()
         return jsonify(success=True, like_count=post.like_count)
@@ -219,10 +277,32 @@ def dislike_post(post_id):
             else:
                 post_like.liked = False
                 post.like_count -= 2  
+                post.user.score -= app.config['SCORE_PER_LIKE'] * 2
+
         else:
             new_like = PostLike(user_id=current_user.user_id, post_id=post_id, liked=False)
             db.session.add(new_like)
+            post.user.score -= app.config['SCORE_PER_LIKE']
             post.like_count -= 1
         db.session.commit()
         return jsonify(success=True, like_count=post.like_count)
     return jsonify(success=False, message="Post not found"), 404
+
+@login_required
+@app.route('/top_liked_posts')
+def top_liked_posts():
+    page = request.args.get('page', 1, type=int)
+    per_page = app.config['POSTS_PER_PAGE']
+    query = sa.select(Post).order_by(Post.like_count.desc())
+    posts = db.paginate(query, page=page, per_page=per_page, error_out=False)
+    
+    next_url = url_for('top_liked_posts', page=posts.next_num) if posts.has_next else None
+    prev_url = url_for('top_liked_posts', page=posts.prev_num) if posts.has_prev else None
+    
+    return render_template('top_liked.html', posts=posts.items, next_url=next_url, prev_url=prev_url)
+
+@login_required
+@app.route('/top_users')
+def top_users():
+    top_users = db.session.query(User).order_by(User.score.desc()).limit(25).all()
+    return render_template('top_users.html', top_users=top_users)

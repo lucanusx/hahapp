@@ -23,7 +23,7 @@
           <p class="text-gray-400">Takipçi</p>
         </div>
         <div>
-          <p class="font-bold text-gray-700 text-xl">8129</p>
+          <p class="font-bold text-gray-700 text-xl">{{user.score}}</p>
           <p class="text-gray-400">Puan</p>
         </div>
       </div>
@@ -108,7 +108,32 @@
   <div class="mt-12 flex flex-col justify-center">
     {% if posts %}
     <h1 class="self-center mb-4 text-2xl font-bold">Gönderiler</h1>
-    {% for post in posts %} {% include '_post.html' %} {% endfor %} {% else %}
+    {% for post in posts %} {% include '_post.html' %} {% endfor %}
+    <div class="mt-6 w-full flex justify-center space-x-4">
+    {% if prev_url %}
+    <a
+      href="{{ prev_url }}"
+      class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700"
+      >Önceki</a
+    >
+    {% else %}
+    <span class="px-4 py-2 bg-gray-300 text-gray-500 rounded cursor-not-allowed"
+      >Önceki</span
+    >
+    {% endif %} {% if next_url %}
+    <a
+      href="{{ next_url }}"
+      class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700"
+      >Sonraki</a
+    >
+    {% else %}
+    <span class="px-4 py-2 bg-gray-300 text-gray-500 rounded cursor-not-allowed"
+      >Sonraki</span
+    >
+    {% endif %}
+  </div>
+  </div>
+    {% else %}
     <h1 class="self-center text-gray-500">
       Bu kullanıcı henüz bir gönderi paylaşmamış.
     </h1>

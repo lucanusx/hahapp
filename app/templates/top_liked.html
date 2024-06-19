@@ -1,14 +1,13 @@
 {% extends "base.html" %} {% block content %}
-<main class="max-w-6xl mx-auto p-6">
-  <div class="flex flex-wrap justify-center gap-8">
-    {% for post in posts %}
-    <div
-      class="w-full max-w-md bg-white rounded-lg shadow-md overflow-hidden transform transition duration-500 hover:scale-105">
-      {% include "_post.html" %}
-    </div>
-    {% endfor %}
+<div class="container mx-auto mt-8 max-w-4xl">
+  <h2 class="text-2xl font-bold mb-4 text-center">
+    En Çok Beğenilen Gönderiler
+  </h2>
+  <div class="grid grid-cols-12 gap-6">
+    {% for post in posts %} {% include '_post.html' %} {% endfor %}
   </div>
-  <div class="pagination mt-8 flex justify-center items-center space-x-4">
+
+  <div class="mt-6 flex justify-center space-x-4">
     {% if prev_url %}
     <a
       href="{{ prev_url }}"
@@ -31,5 +30,5 @@
     >
     {% endif %}
   </div>
-</main>
+</div>
 {% endblock %}

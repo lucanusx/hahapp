@@ -89,3 +89,6 @@ class PostForm(FlaskForm):
     )
     submit = SubmitField('Gönder')
 
+class CommentForm(FlaskForm):
+    comment_text = TextAreaField('Yorum yaz.', validators=[DataRequired(), Length(min=1, max=500)])
+    submit = SubmitField('Gönder')

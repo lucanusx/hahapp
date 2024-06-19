@@ -1,3 +1,5 @@
+# models.py
+
 from datetime import datetime, timezone
 import sqlalchemy as sa
 import sqlalchemy.orm as so
@@ -14,7 +16,6 @@ followers = sa.Table(
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
-
     user_id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
     username = sa.Column(sa.String)
     email = sa.Column(sa.String)
@@ -24,7 +25,10 @@ class User(UserMixin, db.Model):
     registration_date = sa.Column(sa.DateTime, default=datetime.now(timezone.utc))
     last_login_date = sa.Column(sa.DateTime, default=datetime.now(timezone.utc))
     posts = so.relationship("Post", back_populates="user")
-    
+    comments = so.relationship("Comment", back_populates="user")
+    score = sa.Column(sa.Integer, default=0)
+
+
     following = so.relationship(
         'User', secondary=followers,
         primaryjoin=(followers.c.follower_id == user_id),
@@ -81,10 +85,11 @@ class User(UserMixin, db.Model):
             .group_by(Post.post_id)
             .order_by(Post.upload_date.desc())
         )
+    
+    
 
 class Post(db.Model):
     __tablename__ = 'posts'
-
     post_id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
     user_id = sa.Column(sa.Integer, sa.ForeignKey('users.user_id'))
     post_text = sa.Column(sa.String)
@@ -93,18 +98,30 @@ class Post(db.Model):
     like_count = sa.Column(sa.Integer, default=0)
     comment_count = sa.Column(sa.Integer, default=0)
     user = so.relationship("User", back_populates="posts")
+    comments = so.relationship("Comment", back_populates="post")
 
     def __repr__(self):
         return '<Post {}>'.format(self.post_text)
+
+class Comment(db.Model):
+    __tablename__ = 'comments'
+    comment_id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+    post_id = sa.Column(sa.Integer, sa.ForeignKey('posts.post_id'))
+    user_id = sa.Column(sa.Integer, sa.ForeignKey('users.user_id'))
+    comment_text = sa.Column(sa.String)
+    timestamp = sa.Column(sa.DateTime, default=datetime.now(timezone.utc))
+    user = so.relationship("User", back_populates="comments")
+    post = so.relationship("Post", back_populates="comments")
+
+    def __repr__(self):
+        return '<Comment {}>'.format(self.text)
 
 @login.user_loader
 def load_user(user_id):
     return db.session.get(User, int(user_id))
 
-
 class PostLike(db.Model):
     __tablename__ = 'post_likes'
-
     id = sa.Column(sa.Integer, primary_key=True)
     user_id = sa.Column(sa.Integer, sa.ForeignKey('users.user_id'))
     post_id = sa.Column(sa.Integer, sa.ForeignKey('posts.post_id'))

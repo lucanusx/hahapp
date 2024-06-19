@@ -23,9 +23,9 @@
           <h1 class="text-md font-semibold">
             <a
               href="{{url_for('user', username=post.user.username)}}"
-              class="hover:underline">
-              {{ post.user.username }}
-            </a>
+              class="hover:underline"
+              >{{ post.user.username }}</a
+            >
           </h1>
         </div>
         <p class="text-gray-600 text-sm">
@@ -55,6 +55,51 @@
           <i class="fas fa-thumbs-down text-2xl hover:cursor-pointer"></i>
         </a>
       </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-lg overflow-hidden mt-6 p-6">
+    <h3 class="text-lg font-semibold mb-4">Yorumlar</h3>
+    <form
+      action="{{ url_for('add_comment', post_id=post.post_id) }}"
+      method="post">
+      {{ form.hidden_tag() }}
+      <div class="mb-4">
+        {{ form.comment_text.label(class="block text-gray-700 text-sm font-bold
+        mb-2") }} {{ form.comment_text(class="shadow appearance-none border
+        rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
+        focus:shadow-outline") }}
+      </div>
+      <div>
+        {{ form.submit(class="bg-gray-800 hover:bg-gray-700 hover:cursor-pointer
+        text-white font-bold py-2 px-4 rounded focus:outline-none
+        focus:shadow-outline") }}
+      </div>
+    </form>
+    <div class="mt-6">
+      {% for comment in comments %}
+      <div class="mb-4">
+        <div class="flex items-center">
+          <a href="{{url_for('user', username=comment.user.username)}}">
+            <img
+              src="{{ url_for('static', filename='img/' + comment.user.profile_picture) }}"
+              class="w-10 h-10 rounded-full mr-3"
+              alt="User Profile Picture" />
+          </a>
+          <div>
+            <a
+              href="{{url_for('user', username=comment.user.username)}}"
+              class="font-semibold hover:underline"
+              >{{ comment.user.username }}</a
+            >
+            <p class="text-gray-600 text-sm">
+              {{ comment.timestamp.strftime('%Y-%m-%d %H:%M') }}
+            </p>
+          </div>
+        </div>
+        <p class="mt-2">{{ comment.comment_text }}</p>
+      </div>
+      {% endfor %}
     </div>
   </div>
 </div>

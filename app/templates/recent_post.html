@@ -4,5 +4,28 @@
   <div class="grid grid-cols-12 gap-4">
     {% for post in posts %} {% include "_post.html" %} {% endfor %}
   </div>
+  <div class="mt-6 flex justify-between space-x-4">
+    {% if prev_url %}
+    <a
+      href="{{ prev_url }}"
+      class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700"
+      >Önceki</a
+    >
+    {% else %}
+    <span class="px-4 py-2 bg-gray-300 text-gray-500 rounded cursor-not-allowed"
+      >Önceki</span
+    >
+    {% endif %} {% if next_url %}
+    <a
+      href="{{ next_url }}"
+      class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700"
+      >Sonraki</a
+    >
+    {% else %}
+    <span class="px-4 py-2 bg-gray-300 text-gray-500 rounded cursor-not-allowed"
+      >Sonraki</span
+    >
+    {% endif %}
+  </div>
 </div>
 {% endblock %}

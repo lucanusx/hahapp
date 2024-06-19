@@ -10,45 +10,12 @@
   <body>
     <!-- component -->
     <div class="h-screen flex bg-gray-900 items-center justify-center">
-      <div class="grid grid-cols-12 gap-2 gap-y-4 max-w-6xl">
-        <!-- Post 1 -->
-        <div class="col-span-12 sm:col-span-6 md:col-span-3">
-          <card class="w-full flex flex-col">
-            <div class="relative">
-              <!-- Image Video -->
-              <a href="#">
-                <img
-                  src="https://picsum.photos/seed/59/300/200"
-                  class="w-96 h-auto" />
-              </a>
-            </div>
-
-            <div class="flex flex-row mt-2 gap-2">
-              <!-- Profile Picture -->
-              <a href="#">
-                <img
-                  src="https://picsum.photos/seed/1/40/40"
-                  class="rounded-full max-h-10 max-w-10" />
-              </a>
-
-              <!-- Description -->
-              <div clas="flex flex-col">
-                <a href="#">
-                  <p class="text-gray-100 text-sm font-semibold">
-                    Image Description
-                  </p>
-                </a>
-                <a
-                  class="text-gray-400 text-xs mt-2 hover:text-gray-100"
-                  href="#">
-                  Author Name
-                </a>
-                <p class="text-gray-400 text-xs mt-1">3 years ago</p>
-              </div>
-            </div>
-          </card>
-        </div>
-      </div>
+      <a href="{{url_for('register')}}" class="text-3xl text-gray-100"
+        >Kayıt OL</a
+      >
+      <a href="{{url_for('login')}}" class="text-3xl text-gray-100"
+        >Giriş YAP</a
+      >
     </div>
   </body>
 </html>
