@@ -10,6 +10,14 @@ import os
 from functools import wraps
 from flask import abort
 
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or not current_user.is_admin:
+            abort(403)
+        return f(*args, **kwargs)
+    return decorated_function
+
 @app.before_request
 def before_request():
     if current_user.is_authenticated:
@@ -19,13 +27,12 @@ def before_request():
         if not (current_user.is_authenticated and current_user.is_admin):
             if request.endpoint not in ['maintenance','static','login']:
                 return redirect(url_for('maintenance'))
-    
 
 
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template('index.html')
+    return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -60,7 +67,7 @@ def homepage():
 @app.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('index'))
+    return redirect(url_for('login'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -124,6 +131,8 @@ def save_picture(form_picture):
     form_picture.save(picture_path)
     return picture_fn
 
+@login_required
+@admin_required
 @app.route('/500')
 def error_500():
     return render_template('500.html')
@@ -156,7 +165,7 @@ def follow(username):
             sa.select(User).where(User.username == username))
         if user is None:
             flash(f'User {username} not found.')
-            return redirect(url_for('index'))
+            return redirect(url_for('home'))
         if user == current_user:
             flash('You cannot follow yourself!')
             return redirect(url_for('user', username=username))
@@ -165,7 +174,7 @@ def follow(username):
         flash(f'You are following {username}!')
         return redirect(url_for('user', username=username))
     else:
-        return redirect(url_for('index'))
+        return redirect(url_for('home'))
 
 @app.route('/unfollow/<username>', methods=['POST'])
 @login_required
@@ -176,7 +185,7 @@ def unfollow(username):
             sa.select(User).where(User.username == username))
         if user is None:
             flash(f'User {username} not found.')
-            return redirect(url_for('index'))
+            return redirect(url_for('home'))
         if user == current_user:
             flash('You cannot unfollow yourself!')
             return redirect(url_for('user', username=username))
@@ -185,7 +194,7 @@ def unfollow(username):
         flash(f'You are not following {username}.')
         return redirect(url_for('user', username=username))
     else:
-        return redirect(url_for('index'))
+        return redirect(url_for('home'))
 
 
 @login_required
@@ -315,13 +324,7 @@ def top_users():
     return render_template('top_users.html',title="En Aktif Kullanıcılar" ,top_users=top_users)
 
 
-def admin_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated or not current_user.is_admin:
-            abort(403)
-        return f(*args, **kwargs)
-    return decorated_function
+
 
 @app.route('/admin')
 @login_required
@@ -434,7 +437,10 @@ def delete_post(post_id):
 
 @app.route('/maintenance')
 def maintenance():
-    return render_template('maintenance.html')
+    if app.config.get('MAINTENANCE_MODE'):
+        return render_template('maintenance.html')
+    else:
+        return redirect(url_for('homepage'))
 
 @app.route('/admin/config', methods=['GET', 'POST'])
 @login_required

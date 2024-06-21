@@ -1,2 +1,72 @@
-<h1>Site Bakımda</h1>
-<p>Şu anda site bakımda. Lütfen daha sonra tekrar deneyiniz.</p>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bakımdayız</title>
+    <link
+      rel="shortcut icon"
+      href="../static/img/favicon-32x32.png"
+      type="image/x-icon" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet" />
+    <style>
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+
+        50% {
+          transform: translateY(-20px);
+        }
+      }
+
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+
+        50% {
+          opacity: 0;
+        }
+      }
+
+      .bounce {
+        animation: bounce 4s infinite;
+      }
+
+      .blink {
+        animation: blink 3.5s infinite;
+      }
+    </style>
+  </head>
+
+  <body
+    class="bg-gray-900 text-white min-h-screen flex items-center justify-center">
+    <div class="text-center p-6">
+      <div class="mb-8">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-32 w-32 mx-auto text-yellow-400 bounce"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M13 16h-1v-4h-1m0-4h.01M21 12.34a9 9 0 11-7.6-3.46h.01A9.01 9.01 0 0121 12.34z" />
+        </svg>
+      </div>
+      <h1 class="text-4xl font-bold mb-4">Site Bakımda</h1>
+      <p class="text-lg mb-8">
+        Üzgünüz, sitemiz şu anda bakım modunda. Lütfen daha sonra tekrar
+        deneyin!
+      </p>
+      <span class="text-yellow-300 text-2xl blink">Geri Geliyoruz...</span>
+    </div>
+  </body>
+</html>
