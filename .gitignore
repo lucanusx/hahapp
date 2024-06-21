@@ -18,3 +18,5 @@ app/static/img/*
 *.log
 app_backup.db
 get-pip.py
+!app/static/img/default.png
+!app/static/img/favicon-32x32.png

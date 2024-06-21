@@ -36,7 +36,7 @@ def login():
         user = db.session.scalar(
             sa.select(User).where(User.username == form.username.data))
         if user is None or not user.check_password(form.password.data):
-            flash('Invalid username or password')
+            flash('Kullanıcı adı veya şifre yanlış')
             return redirect(url_for('login'))
         login_user(user)
         next_page = request.args.get('next')
@@ -72,7 +72,7 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash('Congratulations, you are now a registered user!')
+        flash('Tebrikler kayıt oldunuz!')
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
@@ -90,7 +90,7 @@ def user(username):
     next_url = url_for('user', username=user.username, page=posts.next_num) if posts.has_next else None
     prev_url = url_for('user', username=user.username, page=posts.prev_num) if posts.has_prev else None
     
-    return render_template('user.html', user=user, form=form, posts=posts.items, next_url=next_url, prev_url=prev_url)
+    return render_template('user.html',title=f"Profil | {user.username}", user=user, form=form, posts=posts.items, next_url=next_url, prev_url=prev_url)
 
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
@@ -113,7 +113,7 @@ def edit_profile():
         form.username.data = current_user.username
         form.about_me.data = current_user.about_me
     
-    return render_template('edit_profile.html', form=form, flash_success=get_flashed_messages(category_filter=['success']))
+    return render_template('edit_profile.html',title="Profil Bilgilerini Güncelle",form=form, flash_success=get_flashed_messages(category_filter=['success']))
 
 def save_picture(form_picture):
     import secrets
@@ -197,7 +197,7 @@ def recent_posts():
     posts = db.paginate(query, page=page, per_page=per_page, error_out=False)
     next_url = url_for('recent_posts', page=posts.next_num) if posts.has_next else None
     prev_url = url_for('recent_posts', page=posts.prev_num) if posts.has_prev else None
-    return render_template('recent_post.html', posts=posts.items, next_url=next_url, prev_url=prev_url)
+    return render_template('recent_post.html',title="Son Paylaşılan Postlar", posts=posts.items, next_url=next_url, prev_url=prev_url)
 
 @app.route('/add_comment/<int:post_id>', methods=['POST'])
 @login_required
@@ -306,13 +306,13 @@ def top_liked_posts():
     next_url = url_for('top_liked_posts', page=posts.next_num) if posts.has_next else None
     prev_url = url_for('top_liked_posts', page=posts.prev_num) if posts.has_prev else None
     
-    return render_template('top_liked.html', posts=posts.items, next_url=next_url, prev_url=prev_url)
+    return render_template('top_liked.html',title="En Beğenilen Postlar", posts=posts.items, next_url=next_url, prev_url=prev_url)
 
 @login_required
 @app.route('/top_users')
 def top_users():
     top_users = db.session.query(User).order_by(User.score.desc()).limit(25).all()
-    return render_template('top_users.html', top_users=top_users)
+    return render_template('top_users.html',title="En Aktif Kullanıcılar" ,top_users=top_users)
 
 
 def admin_required(f):
@@ -327,7 +327,34 @@ def admin_required(f):
 @login_required
 @admin_required
 def dashboard():
-    return render_template('admin.html')
+    try:
+        total_users = User.query.count()
+        active_users = User.query.filter(User.last_login_date >= datetime.utcnow().date()).count()
+        total_posts = Post.query.count()
+        posts_today = Post.query.filter(Post.upload_date >= datetime.utcnow().date()).count()
+        total_comments = Comment.query.count()
+        comments_today = Comment.query.filter(Comment.timestamp >= datetime.utcnow().date()).count()
+        total_likes = PostLike.query.count()
+        users_with_most_posts = User.query.outerjoin(Post).group_by(User.user_id).order_by(sa.func.count(Post.post_id).desc()).limit(5).all()
+        most_liked_posts = Post.query.order_by(Post.like_count.desc()).limit(5).all()
+    except Exception as e:
+        flash(f"Error retrieving data: {e}", "error")
+        total_users = active_users = total_posts = posts_today = total_comments = comments_today = total_likes = 0
+        users_with_most_posts = []
+        most_liked_posts = []
+
+    return render_template('admin.html', 
+                           total_users=total_users, 
+                           active_users=active_users, 
+                           total_posts=total_posts, 
+                           posts_today=posts_today, 
+                           total_comments=total_comments, 
+                           comments_today=comments_today, 
+                           total_likes=total_likes,
+                           users_with_most_posts=users_with_most_posts,
+                           most_liked_posts=most_liked_posts)
+
+
 
 @app.route('/admin/users')
 @login_required
@@ -399,9 +426,9 @@ def delete_post(post_id):
         # Delete the post
         db.session.delete(post)
         db.session.commit()
-        flash('Post has been deleted and user score updated.', 'success')
+        flash('Post silindi.', 'success')
     else:
-        flash('Post not found.', 'danger')
+        flash('Post bulunamadı!.', 'danger')
     return redirect(url_for('manage_posts'))
 
 

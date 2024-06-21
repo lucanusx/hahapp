@@ -15,11 +15,11 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Giriş Yap')
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=25)])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
+    username = StringField('Kullanıcı Adı', validators=[DataRequired(), Length(min=2, max=25)])
+    email = StringField('E-Posta', validators=[DataRequired(), Email()])
+    password = PasswordField('Şifre', validators=[DataRequired()])
     password2 = PasswordField(
-        'Repeat Password', validators=[DataRequired(), EqualTo('password')])
+        'Şifre Tekrar', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Kayıt Ol')
 
     def validate_username(self, username):

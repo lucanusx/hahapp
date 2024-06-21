@@ -3,8 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="../static/css/output.css" />
     <title>Kayıt Ol</title>
+    <link
+      rel="icon"
+      href="../static/img/favicon-32x32.png"
+      type="image/x-icon" />
     <style>
       body {
         background: linear-gradient(135deg, #f7fafc 25%, transparent 25%) -50px 0,
@@ -27,7 +30,26 @@
             Lütfen kayıt olmak için bilgilerinizi giriniz.
           </p>
         </div>
+        <!-- Flash mesajları buraya taşıdık ve tasarımı iyileştirdik -->
         <div class="mt-5">
+          {% with messages = get_flashed_messages() %} {% if messages %}
+          <ul class="mb-4">
+            {% for message in messages %}
+            <li
+              class="flex items-center bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-2"
+              role="alert">
+              <svg
+                class="fill-current w-6 h-6 mr-2"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20">
+                <path
+                  d="M10 15a2 2 0 100 4 2 2 0 000-4zm1-12H9v6h2V3zm0 8H9v2h2v-2z" />
+              </svg>
+              <span class="block sm:inline">{{ message }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+          {% endif %} {% endwith %}
           <form method="post">
             {{ form.hidden_tag() }}
             <div class="relative mt-6">
@@ -35,43 +57,48 @@
               border-gray-300 px-0 py-1 placeholder:text-transparent
               focus:border-gray-500 focus:outline-none") }}
               <label
-                class="pointer-events-none absolute top-0 left-0 origin-left -translate-y-1/2 transform text-sm text-gray-800 opacity-75 transition-all duration-100 ease-in-out peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-0 peer-focus:pl-0 peer-focus:text-sm peer-focus:text-gray-800"
-                >Kullanıcı Adı</label
-              >
+                class="pointer-events-none absolute top-0 left-0 origin-left -translate-y-1/2 transform text-sm text-gray-800 opacity-75 transition-all duration-100 ease-in-out peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-0 peer-focus:pl-0 peer-focus:text-sm peer-focus:text-gray-800">
+                Kullanıcı Adı
+              </label>
+              {% for error in form.username.errors %}
+              <div class="text-red-600 text-sm mt-1">{{ error }}</div>
+              {% endfor %}
             </div>
             <div class="relative mt-6">
               {{ form.email(class_="peer mt-1 w-full border-b-2 border-gray-300
               px-0 py-1 placeholder:text-transparent focus:border-gray-500
-              focus:outline-none") }} {% for error in form.email.errors %}
-              <div
-                class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
-                role="alert">
-                <span class="block sm:inline">{{ error }}</span>
-              </div>
-              {% endfor %}
-
+              focus:outline-none") }}
               <label
-                class="pointer-events-none absolute top-0 left-0 origin-left -translate-y-1/2 transform text-sm text-gray-800 opacity-75 transition-all duration-100 ease-in-out peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-0 peer-focus:pl-0 peer-focus:text-sm peer-focus:text-gray-800"
-                >E-posta Adresi</label
-              >
+                class="pointer-events-none absolute top-0 left-0 origin-left -translate-y-1/2 transform text-sm text-gray-800 opacity-75 transition-all duration-100 ease-in-out peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-0 peer-focus:pl-0 peer-focus:text-sm peer-focus:text-gray-800">
+                E-posta Adresi
+              </label>
+              {% for error in form.email.errors %}
+              <div class="text-red-600 text-sm mt-1">{{ error }}</div>
+              {% endfor %}
             </div>
             <div class="relative mt-6">
               {{ form.password(class_="peer mt-1 w-full border-b-2
               border-gray-300 px-0 py-1 placeholder:text-transparent
               focus:border-gray-500 focus:outline-none") }}
               <label
-                class="pointer-events-none absolute top-0 left-0 origin-left -translate-y-1/2 transform text-sm text-gray-800 opacity-75 transition-all duration-100 ease-in-out peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-0 peer-focus:pl-0 peer-focus:text-sm peer-focus:text-gray-800"
-                >Şifre</label
-              >
+                class="pointer-events-none absolute top-0 left-0 origin-left -translate-y-1/2 transform text-sm text-gray-800 opacity-75 transition-all duration-100 ease-in-out peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-0 peer-focus:pl-0 peer-focus:text-sm peer-focus:text-gray-800">
+                Şifre
+              </label>
+              {% for error in form.password.errors %}
+              <div class="text-red-600 text-sm mt-1">{{ error }}</div>
+              {% endfor %}
             </div>
             <div class="relative mt-6">
               {{ form.password2(class_="peer mt-1 w-full border-b-2
               border-gray-300 px-0 py-1 placeholder:text-transparent
               focus:border-gray-500 focus:outline-none") }}
               <label
-                class="pointer-events-none absolute top-0 left-0 origin-left -translate-y-1/2 transform text-sm text-gray-800 opacity-75 transition-all duration-100 ease-in-out peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-0 peer-focus:pl-0 peer-focus:text-sm peer-focus:text-gray-800"
-                >Şifre Doğrulama</label
-              >
+                class="pointer-events-none absolute top-0 left-0 origin-left -translate-y-1/2 transform text-sm text-gray-800 opacity-75 transition-all duration-100 ease-in-out peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-0 peer-focus:pl-0 peer-focus:text-sm peer-focus:text-gray-800">
+                Şifre Doğrulama
+              </label>
+              {% for error in form.password2.errors %}
+              <div class="text-red-600 text-sm mt-1">{{ error }}</div>
+              {% endfor %}
             </div>
             <div class="my-6">
               {{ form.submit(class_="w-full rounded-md bg-gray-800 px-3 py-4
@@ -81,21 +108,14 @@
               Zaten hesabınız var mı?
               <a
                 href="{{ url_for('login') }}"
-                class="font-semibold text-gray-600 hover:underline focus:text-gray-800 focus:outline-none"
-                >Giriş Yapın!</a
-              >
+                class="font-semibold text-gray-600 hover:underline focus:text-gray-800 focus:outline-none">
+                Giriş Yapın!
+              </a>
             </p>
           </form>
         </div>
       </div>
     </div>
-    <!-- Silinecek  -->
-    {% with messages = get_flashed_messages() %} {% if messages %}
-    <ul>
-      {% for message in messages %}
-      <li class="text-pretty text-gray-900 text-2xl">{{ message }}</li>
-      {% endfor %}
-    </ul>
-    {% endif %} {% endwith %}
+    <script src="https://cdn.tailwindcss.com"></script>
   </body>
 </html>

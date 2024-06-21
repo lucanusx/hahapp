@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
+      rel="icon"
+      href="../static/img/favicon-32x32.png"
+      type="image/x-icon" />
+    <link
       href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
       rel="stylesheet" />
     <link
@@ -13,14 +17,46 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer" />
     <title>Kullanıcı Güncelle</title>
+    <style>
+      .alert {
+        transition: opacity 0.5s ease-out;
+      }
+      .alert.hidden {
+        opacity: 0;
+      }
+    </style>
   </head>
   <body class="bg-gray-100 relative">
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
+    <div
+      id="alert-container"
+      class="fixed top-4 left-1/2 transform -translate-x-1/2 z-10">
+      {% for category, message in messages %}
+      <div
+        class="alert bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-2"
+        role="alert">
+        <span class="block sm:inline">{{ message }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    <script>
+      setTimeout(() => {
+        document
+          .querySelector("#alert-container .alert")
+          .classList.add("hidden");
+      }, 3000);
+      setTimeout(() => {
+        document.querySelector("#alert-container").style.display = "none";
+      }, 3500);
+    </script>
+    {% endif %} {% endwith %}
     <div class="flex justify-center relative">
       <a
         href="{{ url_for('admin_users')}} "
-        class="inline-block mt-10 self-start absolute left-96 ml-8 top-2 rounded-full hover:cursor-pointer hover:bg-gray-200 p-2 transition-colors duration-500 ease-in-out"
-        ><i class="fa-solid fa-arrow-left text-4xl"></i
-      ></a>
+        class="inline-block mt-10 self-start absolute left-96 ml-8 top-2 rounded-full hover:cursor-pointer hover:bg-gray-200 p-2 transition-colors duration-500 ease-in-out">
+        <i class="fa-solid fa-arrow-left text-4xl"></i>
+      </a>
       <div class="container mt-10">
         <div class="max-w-xl mx-auto bg-white p-5 rounded-lg shadow-md">
           <h2 class="text-2xl font-bold mb-5">
@@ -80,7 +116,6 @@
                 {{ user.last_login_date }}
               </p>
             </div>
-
             <div class="mb-4">
               <button
                 type="submit"
@@ -92,8 +127,10 @@
           </form>
         </div>
       </div>
-      <img src="{{ url_for('static', filename='img/' + user.profile_picture) }}"
-      alt="" / class="h-24 inline-block mt-12 absolute ml-96 rounded-full">
+      <img
+        src="{{ url_for('static', filename='img/' + user.profile_picture) }}"
+        alt=""
+        class="h-24 inline-block mt-12 absolute ml-96 rounded-full" />
     </div>
   </body>
 </html>

@@ -45,7 +45,8 @@
       </div>
       <div>
         {{ form.submit(class="bg-blue-500 text-white px-6 py-3 rounded-lg
-        hover:bg-blue-600 focus:outline-none focus:bg-blue-600") }}
+        hover:bg-blue-600 focus:outline-none focus:bg-blue-600
+        hover:cursor-pointer") }}
       </div>
     </form>
   </div>
@@ -53,7 +54,7 @@
 
 <script>
   document.getElementById("postForm").onsubmit = function (event) {
-    event.preventDefault(); // Prevent the default form submission
+    event.preventDefault();
     fetch("", {
       method: "POST",
       body: new FormData(this),

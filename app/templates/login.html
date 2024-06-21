@@ -3,7 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="../static/css/output.css" />
+    <link
+      rel="icon"
+      href="../static/img/favicon-32x32.png"
+      type="image/x-icon" />
     <title>Giriş Yap</title>
     <style>
       body {
@@ -26,7 +29,21 @@
             Giriş yapmak için lütfen bilgilerinizi giriniz.
           </p>
         </div>
+        <!-- Flash mesajları buraya taşıdık ve tasarımı iyileştirdik -->
         <div class="mt-5">
+          {% with messages = get_flashed_messages() %} {% if messages %}
+          <ul class="mb-4">
+            {% for message in messages %}
+            <li
+              class="flex items-center bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-2"
+              role="alert">
+              <span class="block sm:inline bg-red-100 border"
+                >{{ message }}</span
+              >
+            </li>
+            {% endfor %}
+          </ul>
+          {% endif %} {% endwith %}
           <form method="post">
             {{ form.hidden_tag() }}
             <div class="relative mt-6">
@@ -48,8 +65,10 @@
               >
             </div>
             <div class="my-6">
-              {{form.submit(class_="w-full rounded-md bg-gray-800 px-3 py-4
-              text-white focus:bg-gray-600 focus:outline-none", value="Giriş Yap")}}
+              {{ form.submit(class_="w-full hover:cursor-pointer rounded-md
+              bg-gray-800 px-3 py-4 text-white hover:bg-gray-500
+              focus:outline-none ease-in-out transition-all delay-100",
+              value="Giriş Yap") }}
             </div>
             <p class="text-center text-sm text-gray-500">
               Hesabınız yok mu?
@@ -59,16 +78,10 @@
                 >Kaydolun!</a
               >
             </p>
-          <!-- Silinecek  -->
-          {% with messages = get_flashed_messages() %} {% if messages %}
-          <ul>
-            {% for message in messages %}
-            <li class="text-pretty text-gray-900 text-2xl">{{ message }}</li>
-            {% endfor %}
-          </ul>
-          {% endif %} {% endwith %}
+          </form>
         </div>
       </div>
     </div>
+    <script src="https://cdn.tailwindcss.com"></script>
   </body>
 </html>

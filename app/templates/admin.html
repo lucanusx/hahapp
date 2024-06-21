@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard</title>
     <link
+      rel="icon"
+      href="../static/img/favicon-32x32.png"
+      type="image/x-icon" />
+    <link
       href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
       rel="stylesheet" />
     <link
@@ -20,12 +24,12 @@
   <body class="bg-gray-100">
     <div class="container mx-auto px-6 py-8 mt-8">
       <h1 class="text-3xl font-bold mb-8 flex justify-between">
-        <span> Admin </span>
-        <span class="text-2xl"> {{current_user.username}} </span>
+        <span>Admin</span>
+        <span class="text-2xl">{{current_user.username}}</span>
       </h1>
       <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700" />
 
-      <div class="grid grid-cols-3 gap-6">
+      <div class="grid grid-cols-3 gap-6 mb-8">
         <div
           class="bg-white rounded-lg shadow-lg p-6 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105">
           <div class="flex items-center">
@@ -37,9 +41,9 @@
           </div>
           <a
             href="/admin/users"
-            class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-4 inline-block cursor-pointer">
-            Kullanıcıları Yönet
-          </a>
+            class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-4 inline-block cursor-pointer"
+            >Kullanıcıları Yönet</a
+          >
         </div>
         <div
           class="bg-white rounded-lg shadow-lg p-6 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105">
@@ -52,9 +56,9 @@
           </div>
           <a
             href="/admin/posts"
-            class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-4 inline-block cursor-pointer">
-            Postları Düzenle
-          </a>
+            class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-4 inline-block cursor-pointer"
+            >Postları Düzenle</a
+          >
         </div>
         <div
           class="bg-white rounded-lg shadow-lg p-6 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105">
@@ -67,17 +71,81 @@
           </div>
           <a
             href="/admin/config"
-            class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-4 inline-block cursor-pointer">
-            Site Ayarları
-          </a>
+            class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-4 inline-block cursor-pointer"
+            >Site Ayarları</a
+          >
         </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <h2 class="text-2xl font-bold mb-4">Site İstatistikleri</h2>
+        <table class="min-w-full bg-white">
+          <thead>
+            <tr>
+              <th class="py-2">İstatistik</th>
+              <th class="py-2">Değer</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="border px-4 py-2">Toplam Kullanıcı</td>
+              <td class="border px-4 py-2">{{ total_users }}</td>
+            </tr>
+            <tr>
+              <td class="border px-4 py-2">Aktif Kullanıcı (son 24 saat)</td>
+              <td class="border px-4 py-2">{{ active_users }}</td>
+            </tr>
+            <tr>
+              <td class="border px-4 py-2">Toplam Post</td>
+              <td class="border px-4 py-2">{{ total_posts }}</td>
+            </tr>
+            <tr>
+              <td class="border px-4 py-2">Bugün Eklenen Post</td>
+              <td class="border px-4 py-2">{{ posts_today }}</td>
+            </tr>
+            <tr>
+              <td class="border px-4 py-2">Toplam Yorum</td>
+              <td class="border px-4 py-2">{{ total_comments }}</td>
+            </tr>
+            <tr>
+              <td class="border px-4 py-2">Bugün Eklenen Yorum</td>
+              <td class="border px-4 py-2">{{ comments_today }}</td>
+            </tr>
+            <tr>
+              <td class="border px-4 py-2">Toplam Beğeni</td>
+              <td class="border px-4 py-2">{{ total_likes }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <h2 class="text-2xl font-bold mb-4">En Aktif Kullanıcılar</h2>
+        <ul>
+          {% for user in users_with_most_posts %}
+          <li class="border px-4 py-2">
+            {{ user.username }} - {{ user.posts|length }} post
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-2xl font-bold mb-4">En Çok Beğenilen Postlar</h2>
+        <ul>
+          {% for post in most_liked_posts %}
+          <li class="border px-4 py-2">
+            {{ post.post_text }} - {{ post.like_count }} beğeni
+          </li>
+          {% endfor %}
+        </ul>
       </div>
     </div>
 
     <a
       href="/home"
-      class="absolute bottom-6 left-6 bg-white p-3 rounded-full shadow-md cursor-pointer border border-gray-200"
-      ><i class="fa-solid fa-arrow-left text-2xl"></i>
-    </a>
+      class="fixed bottom-6 left-6 bg-white p-3 rounded-full shadow-md cursor-pointer border border-gray-200"
+      ><i class="fa-solid fa-arrow-left text-2xl"></i
+    ></a>
   </body>
 </html>
