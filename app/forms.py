@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, FileField
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, FileField, DateTimeField, IntegerField
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Optional
 import sqlalchemy as sa
 from app import db
 from app.models import User
@@ -92,3 +92,20 @@ class PostForm(FlaskForm):
 class CommentForm(FlaskForm):
     comment_text = TextAreaField('Yorum yaz.', validators=[DataRequired(), Length(min=1, max=500)])
     submit = SubmitField('Gönder')
+
+class EditUserForm(FlaskForm):
+    username = StringField('Kullanıcı Adı', validators=[DataRequired()])
+    email = StringField('E-Posta', validators=[DataRequired(), Email()])
+    about_me = StringField('Hakkında', validators=[Optional()])
+    password = PasswordField('Yeni Şifre', validators=[Optional()])
+    score = IntegerField('Puan', validators=[Optional()])
+    is_admin = BooleanField('Admin')
+    delete_profile_picture = BooleanField('Profil resmini sil')
+    submit = SubmitField('Kaydet')
+
+class AdminConfigForm(FlaskForm):
+    score_per_like = IntegerField('Beğeni Puan Değeri', validators=[DataRequired()])
+    score_per_comment = IntegerField('Yorum Puan Değeri', validators=[DataRequired()])
+    score_per_post = IntegerField('Postların Puan Değeri', validators=[DataRequired()])
+    maintenance_mode = BooleanField('Bakım Modu')
+    submit = SubmitField('Güncelle')

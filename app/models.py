@@ -27,6 +27,7 @@ class User(UserMixin, db.Model):
     posts = so.relationship("Post", back_populates="user")
     comments = so.relationship("Comment", back_populates="user")
     score = sa.Column(sa.Integer, default=0)
+    is_admin = sa.Column(sa.Boolean, default=False)
 
 
     following = so.relationship(
@@ -86,6 +87,8 @@ class User(UserMixin, db.Model):
             .order_by(Post.upload_date.desc())
         )
     
+    def is_authenticated(self):
+        return self.is_admin
     
 
 class Post(db.Model):

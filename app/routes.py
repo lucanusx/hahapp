@@ -1,19 +1,26 @@
-from flask import render_template, flash, redirect, url_for, request, get_flashed_messages, jsonify
+from flask import render_template, flash, redirect, url_for, request, get_flashed_messages, jsonify, send_from_directory
 from flask_login import login_user, logout_user, current_user, login_required
 import sqlalchemy as sa
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, EmptyForm, EditProfileForm, PostForm, CommentForm
+from app.forms import LoginForm, RegistrationForm, EmptyForm, EditProfileForm, PostForm, CommentForm, EditUserForm, AdminConfigForm
 from app.models import User, Post, PostLike, Comment
 from datetime import datetime, timezone
-from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash
 import os
-
+from functools import wraps
+from flask import abort
 
 @app.before_request
 def before_request():
     if current_user.is_authenticated:
         current_user.last_login_date = datetime.now(timezone.utc)
         db.session.commit()
+    if app.config.get('MAINTENANCE_MODE'):
+        if not (current_user.is_authenticated and current_user.is_admin):
+            if request.endpoint not in ['maintenance','static','login']:
+                return redirect(url_for('maintenance'))
+    
+
 
 @app.route('/')
 @app.route('/index')
@@ -306,3 +313,154 @@ def top_liked_posts():
 def top_users():
     top_users = db.session.query(User).order_by(User.score.desc()).limit(25).all()
     return render_template('top_users.html', top_users=top_users)
+
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or not current_user.is_admin:
+            abort(403)
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.route('/admin')
+@login_required
+@admin_required
+def dashboard():
+    return render_template('admin.html')
+
+@app.route('/admin/users')
+@login_required
+@admin_required
+def admin_users():
+    users = db.session.query(User).all()
+    return render_template('admin_users.html', users=users)
+
+
+@app.route('/admin/users/<int:user_id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def edit_user(user_id):
+    user = User.query.get_or_404(user_id)
+    form = EditUserForm(obj=user)
+    if form.validate_on_submit():
+        if form.delete_profile_picture.data:
+            user.profile_picture = 'default.png'
+        else:
+            user.username = form.username.data
+            user.email = form.email.data
+            user.about_me = form.about_me.data
+            if form.password.data:
+                user.set_password(form.password.data)
+            user.score = form.score.data
+            user.is_admin = form.is_admin.data
+        db.session.commit()
+        flash('Kullanıcı başarıyla güncellendi!', 'success')
+        return redirect(url_for('edit_user', user_id=user.user_id))
+    return render_template('edit_user.html', form=form, user=user)
+
+@app.route('/admin/posts')
+@login_required
+@admin_required
+def manage_posts():
+    page = request.args.get('page', 1, type=int)
+    per_page = app.config['POSTS_PER_PAGE']
+    query = sa.select(Post).order_by(Post.upload_date.desc())
+    posts = db.paginate(query, page=page, per_page=per_page, error_out=False)
+    
+    next_url = url_for('manage_posts', page=posts.next_num) if posts.has_next else None
+    prev_url = url_for('manage_posts', page=posts.prev_num) if posts.has_prev else None
+
+    return render_template('admin_posts.html', posts=posts.items, next_url=next_url, prev_url=prev_url)
+
+@app.route('/delete_post/<int:post_id>', methods=['POST'])
+@login_required
+def delete_post(post_id):
+    post = db.session.get(Post, post_id)
+    if post:
+        user = post.user
+        
+        # Remove the likes and update the score
+        for like in post.post_likes:
+            if like.liked:
+                user.score -= app.config['SCORE_PER_LIKE']
+            else:
+                user.score += app.config['SCORE_PER_LIKE']
+            db.session.delete(like)
+
+        # Remove the comments and update the score
+        for comment in post.comments:
+            user.score -= app.config['SCORE_PER_COMMENT']
+            db.session.delete(comment)
+
+        # Adjust the user's score for the post itself
+        user.score -= app.config['SCORE_PER_POST']
+
+        # Delete the post
+        db.session.delete(post)
+        db.session.commit()
+        flash('Post has been deleted and user score updated.', 'success')
+    else:
+        flash('Post not found.', 'danger')
+    return redirect(url_for('manage_posts'))
+
+
+@app.route('/maintenance')
+def maintenance():
+    return render_template('maintenance.html')
+
+@app.route('/admin/config', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def admin_config():
+    form = AdminConfigForm()
+    if form.validate_on_submit():
+        app.config['SCORE_PER_LIKE'] = form.score_per_like.data
+        app.config['SCORE_PER_COMMENT'] = form.score_per_comment.data
+        app.config['SCORE_PER_POST'] = form.score_per_post.data
+        app.config['MAINTENANCE_MODE'] = form.maintenance_mode.data
+
+        # Update config.py
+        with open('config.py', 'r') as file:
+            config_content = file.readlines()
+
+        new_config_content = []
+        for line in config_content:
+            if 'SCORE_PER_LIKE' in line:
+                indent = len(line) - len(line.lstrip())
+                new_config_content.append(f'{" " * indent}SCORE_PER_LIKE = {form.score_per_like.data}\n')
+            elif 'SCORE_PER_COMMENT' in line:
+                indent = len(line) - len(line.lstrip())
+                new_config_content.append(f'{" " * indent}SCORE_PER_COMMENT = {form.score_per_comment.data}\n')
+            elif 'SCORE_PER_POST' in line:
+                indent = len(line) - len(line.lstrip())
+                new_config_content.append(f'{" " * indent}SCORE_PER_POST = {form.score_per_post.data}\n')
+            elif 'MAINTENANCE_MODE' in line:
+                indent = len(line) - len(line.lstrip())
+                new_config_content.append(f'{" " * indent}MAINTENANCE_MODE = {1 if form.maintenance_mode.data else 0}\n')
+            else:
+                new_config_content.append(line)
+
+        with open('config.py', 'w') as file:
+            file.writelines(new_config_content)
+
+        flash('Ayarlar güncellendi.', 'success')
+        return redirect(url_for('admin_config'))
+
+    form.score_per_like.data = app.config['SCORE_PER_LIKE']
+    form.score_per_comment.data = app.config['SCORE_PER_COMMENT']
+    form.score_per_post.data = app.config['SCORE_PER_POST']
+    form.maintenance_mode.data = app.config['MAINTENANCE_MODE']
+    
+    log_dir = os.path.join(os.path.dirname(app.root_path), 'logs')
+    log_files = os.listdir(log_dir) if os.path.exists(log_dir) else []
+
+    return render_template('admin_config.html', form=form, log_files=log_files)
+
+
+@app.route('/logs/<path:filename>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def download_log(filename):
+    log_dir = os.path.join(os.path.dirname(app.root_path), 'logs')
+    return send_from_directory(directory=log_dir, path=filename, as_attachment=True)

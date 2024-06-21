@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer" />
+    <title>Kullanıcı Güncelle</title>
+  </head>
+  <body class="bg-gray-100 relative">
+    <div class="flex justify-center relative">
+      <a
+        href="{{ url_for('admin_users')}} "
+        class="inline-block mt-10 self-start absolute left-96 ml-8 top-2 rounded-full hover:cursor-pointer hover:bg-gray-200 p-2 transition-colors duration-500 ease-in-out"
+        ><i class="fa-solid fa-arrow-left text-4xl"></i
+      ></a>
+      <div class="container mt-10">
+        <div class="max-w-xl mx-auto bg-white p-5 rounded-lg shadow-md">
+          <h2 class="text-2xl font-bold mb-5">
+            Kullanıcı bilgilerini güncelle
+          </h2>
+          <form
+            action="{{ url_for('edit_user', user_id=user.user_id) }}"
+            method="POST">
+            {{ form.hidden_tag() }}
+            <div class="mb-4">
+              {{ form.username.label(class="block text-gray-700") }} {{
+              form.username(class="mt-1 block w-full border-gray-300 rounded-md
+              shadow-sm") }}
+            </div>
+            <div class="mb-4">
+              {{ form.email.label(class="block text-gray-700") }} {{
+              form.email(class="mt-1 block w-full border-gray-300 rounded-md
+              shadow-sm") }}
+            </div>
+            <div class="mb-4">
+              {{ form.about_me.label(class="block text-gray-700") }} {{
+              form.about_me(class="mt-1 block w-full border-gray-300 rounded-md
+              shadow-sm") }}
+            </div>
+            <div class="mb-4">
+              {{ form.password.label(class="block text-gray-700") }} {{
+              form.password(class="mt-1 block w-full border-gray-300 rounded-md
+              shadow-sm") }}
+            </div>
+            <div class="mb-4">
+              {{ form.score.label(class="block text-gray-700") }} {{
+              form.score(class="mt-1 block w-full border-gray-300 rounded-md
+              shadow-sm") }}
+            </div>
+            <div class="flex w-96">
+              <div class="mb-4 inline-block">
+                {{ form.is_admin.label(class="block text-gray-700") }} {{
+                form.is_admin(class="mt-1") }}
+              </div>
+              <div class="mb-4 inline-block ml-6">
+                {{ form.delete_profile_picture.label(class="block
+                text-gray-700") }} {{ form.delete_profile_picture(class="mt-1")
+                }}
+              </div>
+            </div>
+            <div class="mb-4">
+              <label class="block text-gray-700">Kayıt Tarihi</label>
+              <p
+                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm bg-gray-100 p-2">
+                {{ user.registration_date }}
+              </p>
+            </div>
+            <div class="mb-4">
+              <label class="block text-gray-700">Son Giriş</label>
+              <p
+                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm bg-gray-100 p-2">
+                {{ user.last_login_date }}
+              </p>
+            </div>
+
+            <div class="mb-4">
+              <button
+                type="submit"
+                name="submit"
+                class="bg-gray-800 text-white py-2 px-4 rounded-md shadow-sm hover:bg-gray-700">
+                Güncelle
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <img src="{{ url_for('static', filename='img/' + user.profile_picture) }}"
+      alt="" / class="h-24 inline-block mt-12 absolute ml-96 rounded-full">
+    </div>
+  </body>
+</html>

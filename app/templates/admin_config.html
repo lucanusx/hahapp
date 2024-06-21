@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Config</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer" />
+    <script
+      src="https://kit.fontawesome.com/your-kit-code.js"
+      crossorigin="anonymous"></script>
+  </head>
+  <body
+    class="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
+    <div class="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
+      <h1 class="text-2xl font-bold text-center text-gray-800">
+        Site Ayarları
+      </h1>
+      <form method="POST" action="{{ url_for('admin_config') }}" class="mt-6">
+        {{ form.hidden_tag() }}
+        <div class="mb-4">
+          <label
+            for="score_per_like"
+            class="block text-gray-700 text-sm font-bold mb-2"
+            >Beğeni başına puan</label
+          >
+          {{ form.score_per_like(size=32, class="shadow appearance-none border
+          rounded w-full py-2 px-3 text-gray-700 leading-tight
+          focus:outline-none focus:shadow-outline") }}
+        </div>
+        <div class="mb-4">
+          <label
+            for="score_per_comment"
+            class="block text-gray-700 text-sm font-bold mb-2"
+            >Yorum başına puan</label
+          >
+          {{ form.score_per_comment(size=32, class="shadow appearance-none
+          border rounded w-full py-2 px-3 text-gray-700 leading-tight
+          focus:outline-none focus:shadow-outline") }}
+        </div>
+        <div class="mb-4">
+          <label
+            for="score_per_post"
+            class="block text-gray-700 text-sm font-bold mb-2"
+            >Post başına puan</label
+          >
+          {{ form.score_per_post(size=32, class="shadow appearance-none border
+          rounded w-full py-2 px-3 text-gray-700 leading-tight
+          focus:outline-none focus:shadow-outline") }}
+        </div>
+        <div class="mb-6">
+          <div class="flex items-center">
+            <label
+              for="maintenance_mode"
+              class="block text-gray-700 text-sm font-bold mb-2 text-center"
+              >Bakım modu</label
+            >
+            {{ form.maintenance_mode(class="form-checkbox w-5 text-blue-600 ml-2
+            h-6 mb-2") }}
+          </div>
+        </div>
+        <div class="flex items-center justify-between">
+          {{ form.submit(class="bg-blue-500 hover:bg-blue-700 text-white
+          font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline")
+          }}
+        </div>
+      </form>
+    </div>
+
+    <h2 class="mt-8 text-2xl font-bold text-center text-gray-800">
+      Log Dosyaları
+    </h2>
+    <p class="text-center w-full inline-block text-gray-800 text-sm font-thin">
+      İndirmek için tıklayın.
+    </p>
+    <ul class="mt-4 list-inside">
+      {% for log in log_files %}
+      <li class="mb-2">
+        <a
+          href="{{ url_for('download_log', filename=log) }}"
+          class="text-blue-500 hover:underline"
+          ><i class="fas fa-file-alt"></i> {{ log }}</a
+        >
+      </li>
+      {% endfor %}
+    </ul>
+    <a
+      href="/admin"
+      class="absolute bg-white left-6 bottom-6 p-3 rounded-full shadow-md cursor-pointer border border-gray-200"
+      ><i class="fa-solid fa-arrow-left text-2xl"></i>
+    </a>
+  </body>
+</html>

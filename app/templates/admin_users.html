@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kullanıcı Yönetimi</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer" />
+  </head>
+  <body class="text-gray-700">
+    <table class="min-w-full border-separate">
+      <thead
+        class="text-xs font-medium tracking-wider text-left text-gray-500 uppercase border-b border-gray-200">
+        <tr>
+          <th class="px-6 py-4 border-b border-gray-200">Kullanıcı Adı</th>
+          <th class="px-6 py-4 border-b border-gray-200">E-posta</th>
+          <th class="px-6 py-4 border-b border-gray-200">Yönetici</th>
+          <th class="px-6 py-4 border-b border-gray-200">Düzenlemeler</th>
+        </tr>
+      </thead>
+      <tbody class="text-sm text-gray-700">
+        {% for user in users %}
+        <tr class="border-b border-gray-200 hover:bg-gray-100">
+          <td class="px-6 py-4 whitespace-nowrap">{{ user.username }}</td>
+          <td class="px-6 py-4 whitespace-nowrap">{{ user.email }}</td>
+          <td class="px-6 py-4 whitespace-nowrap">{{ user.is_admin }}</td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <a
+              href="{{ url_for('edit_user', user_id=user.user_id) }}"
+              class="px-2 py-1 bg-blue-500 text-white font-bold rounded"
+              >Düzenle</a
+            >
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <a
+      href="/admin"
+      class="absolute bg-white left-6 bottom-6 p-3 rounded-full shadow-md cursor-pointer border border-gray-200"
+      ><i class="fa-solid fa-arrow-left text-2xl"></i>
+    </a>
+  </body>
+</html>

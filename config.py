@@ -10,3 +10,4 @@ class Config:
     SCORE_PER_LIKE = 1
     SCORE_PER_COMMENT = 2
     SCORE_PER_POST = 5
+    MAINTENANCE_MODE = 0

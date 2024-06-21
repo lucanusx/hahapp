@@ -30,17 +30,12 @@
       <div class="relative">
         <div
           class="w-48 h-48 mx-auto rounded-full shadow-2xl absolute inset-x-0 top-0 -mt-24 flex items-center justify-center text-indigo-500">
-          {% if user.profile_picture %}
+
           <img
             src="{{ url_for('static', filename='img/' + user.profile_picture) }}"
             alt="profile picture"
             class="h-48 w-48 rounded-full object-cover" />
-          {% else %}
-          <img
-            src="{{ url_for('static', filename='img/default.png') }}"
-            alt="profile picture"
-            class="h-48 w-48 rounded-full object-cover" />
-          {% endif %}
+
         </div>
       </div>
 
